@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"/>
+<title>Карта пояса · Мечта в центре · сделки март–авг 2026</title>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  html,body,#map { height:100%; margin:0; }
+  .panel {
+    position:absolute; z-index:1000; top:12px; left:12px; max-width:340px;
+    background:rgba(255,255,255,.94); padding:12px 14px; border-radius:10px;
+    font:14px/1.35 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    box-shadow:0 2px 12px rgba(0,0,0,.15);
+  }
+  .panel h1 { font-size:15px; margin:0 0 6px; }
+  .panel p { margin:0 0 6px; color:#333; }
+  .legend { font-size:12px; color:#555; }
+  .dot { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:4px; }
+</style>
+</head>
+<body>
+<div class="panel">
+  <h1>Пояс вокруг «Мечты»</h1>
+  <p>Размер круга ∝ √(число сделок нетто), март–авг 2026. Центр — центроид корпусов «Мечты» в Дом.рф.</p>
+  <p class="legend"><span class="dot" style="background:#e74c3c"></span>Мечта · <span class="dot" style="background:#3498db"></span>соседи · км — по дуге, не по дороге</p>
+  <p class="legend">Источник: выгрузки Дом.рф МО 29.09 + Москва 01.10</p>
+</div>
+<div id="map"></div>
+<script>
+const points = [{"name": "Мечта", "gk": "СЗ МЕГА-МЕЧТА", "np": "Дмитров", "lat": 56.074229, "lon": 37.373076, "km": 0.0, "deals": 46, "price_m2": 230803, "is_mechta": true, "radius_m": 1220, "color": "#c0392b", "fill": "#e74c3c"}, {"name": "1-й Химкинский", "gk": "ФСК", "np": "Химки", "lat": 55.956209, "lon": 37.477166, "km": 14.6, "deals": 684, "price_m2": 246458, "is_mechta": false, "radius_m": 4707, "color": "#2980b9", "fill": "#3498db"}, {"name": "1-й Шереметьевский", "gk": "ФСК", "np": "Химки", "lat": 55.94568, "lon": 37.33613, "km": 14.5, "deals": 392, "price_m2": 275636, "is_mechta": false, "radius_m": 3563, "color": "#2980b9", "fill": "#3498db"}, {"name": "Зелёный парк", "gk": "ПИК", "np": "Москва", "lat": 55.963602, "lon": 37.174649, "km": 17.4, "deals": 324, "price_m2": 291541, "is_mechta": false, "radius_m": 3240, "color": "#2980b9", "fill": "#3498db"}, {"name": "Императорские Мытищи", "gk": "Гранель", "np": "Мытищи", "lat": 55.961672, "lon": 37.650523, "km": 21.3, "deals": 130, "price_m2": 191278, "is_mechta": false, "radius_m": 2052, "color": "#2980b9", "fill": "#3498db"}, {"name": "Планерный квартал", "gk": "ЖИЛСТРОЙ", "np": "Химки", "lat": 55.880873, "lon": 37.416442, "km": 21.7, "deals": 122, "price_m2": 288358, "is_mechta": false, "radius_m": 1988, "color": "#2980b9", "fill": "#3498db"}, {"name": "Лесная отрада", "gk": "Отрада", "np": "Красногорск", "lat": 55.896302, "lon": 37.304249, "km": 20.2, "deals": 111, "price_m2": 229333, "is_mechta": false, "radius_m": 1896, "color": "#2980b9", "fill": "#3498db"}, {"name": "Молодежный-2", "gk": "Холдинг Агрострой", "np": "Солнечногорск", "lat": 56.080052, "lon": 37.061421, "km": 19.3, "deals": 109, "price_m2": 151582, "is_mechta": false, "radius_m": 1879, "color": "#2980b9", "fill": "#3498db"}, {"name": "Молжаниново", "gk": "Самолет", "np": "Москва", "lat": 55.937278, "lon": 37.359605, "km": 15.2, "deals": 96, "price_m2": 288053, "is_mechta": false, "radius_m": 1763, "color": "#2980b9", "fill": "#3498db"}, {"name": "Тайм", "gk": "Град Девелопмент", "np": "Химки", "lat": 55.922222, "lon": 37.373639, "km": 16.9, "deals": 86, "price_m2": 321267, "is_mechta": false, "radius_m": 1669, "color": "#2980b9", "fill": "#3498db"}, {"name": "Новый Зеленоград", "gk": "Ikon Development", "np": "Брехово", "lat": 55.951107, "lon": 37.18395, "km": 18.0, "deals": 80, "price_m2": 266493, "is_mechta": false, "radius_m": 1609, "color": "#2980b9", "fill": "#3498db"}, {"name": "Берег", "gk": "СЗ МОНТАЖСТРОЙ", "np": "Химки", "lat": 55.948888, "lon": 37.474766, "km": 15.3, "deals": 78, "price_m2": 197074, "is_mechta": false, "radius_m": 1589, "color": "#2980b9", "fill": "#3498db"}, {"name": "Большое Юрлово", "gk": "Самолет", "np": "Химки", "lat": 55.903312, "lon": 37.271065, "km": 20.0, "deals": 77, "price_m2": 155109, "is_mechta": false, "radius_m": 1579, "color": "#2980b9", "fill": "#3498db"}, {"name": "Лесная Коллекция", "gk": "Град Девелопмент", "np": "Химки", "lat": 55.882133, "lon": 37.407502, "km": 21.5, "deals": 69, "price_m2": 309410, "is_mechta": false, "radius_m": 1495, "color": "#2980b9", "fill": "#3498db"}, {"name": "Катуар", "gk": "Катуар Девелопмент", "np": "Мытищи", "lat": 56.086679, "lon": 37.508641, "km": 8.6, "deals": 68, "price_m2": 160603, "is_mechta": false, "radius_m": 1484, "color": "#2980b9", "fill": "#3498db"}, {"name": "Пятницкие луга", "gk": "Самолет", "np": "Химки", "lat": 55.898527, "lon": 37.251172, "km": 20.9, "deals": 65, "price_m2": 189616, "is_mechta": false, "radius_m": 1451, "color": "#2980b9", "fill": "#3498db"}, {"name": "Большевик", "gk": "СЗ НЕДВИЖИМОСТЬ", "np": "Дмитров", "lat": 56.344007, "lon": 37.54227, "km": 31.8, "deals": 55, "price_m2": 159623, "is_mechta": false, "radius_m": 1334, "color": "#2980b9", "fill": "#3498db"}, {"name": "Квартал Ивакино", "gk": "Самолет", "np": "Химки", "lat": 55.956963, "lon": 37.47611, "km": 14.5, "deals": 54, "price_m2": 194205, "is_mechta": false, "radius_m": 1322, "color": "#2980b9", "fill": "#3498db"}, {"name": "Химки Парк", "gk": "Самолет", "np": "Химки", "lat": 55.908036, "lon": 37.432951, "km": 18.9, "deals": 52, "price_m2": 215932, "is_mechta": false, "radius_m": 1297, "color": "#2980b9", "fill": "#3498db"}, {"name": "Бригантина", "gk": "Гранель", "np": "Долгопрудный", "lat": 55.95387, "lon": 37.485951, "km": 15.1, "deals": 49, "price_m2": 284976, "is_mechta": false, "radius_m": 1260, "color": "#2980b9", "fill": "#3498db"}, {"name": "Куркинское 15", "gk": "СЗ КУРКИНСКИЙ ПРОЕКТ", "np": "Москва", "lat": 55.884077, "lon": 37.404409, "km": 21.2, "deals": 47, "price_m2": 357381, "is_mechta": false, "radius_m": 1234, "color": "#2980b9", "fill": "#3498db"}, {"name": "Шолохово", "gk": "РосЕвроСити", "np": "Мытищи", "lat": 56.048748, "lon": 37.54312, "km": 11.0, "deals": 41, "price_m2": 165705, "is_mechta": false, "radius_m": 1152, "color": "#2980b9", "fill": "#3498db"}, {"name": "Новокуркино", "gk": "ПИК", "np": "Химки", "lat": 55.901353, "lon": 37.403702, "km": 19.3, "deals": 0, "price_m2": null, "is_mechta": false, "radius_m": 311, "color": "#2980b9", "fill": "#3498db"}, {"name": "Зеленый Оазис-Город", "gk": "СЗ КОНЦЕПТ ИММО ДЕВЕЛОПМЕНТ", "np": "Дмитров", "lat": 56.062824, "lon": 37.358061, "km": 1.6, "deals": 0, "price_m2": null, "is_mechta": false, "radius_m": 311, "color": "#2980b9", "fill": "#3498db"}, {"name": "Зеленоград Сити", "gk": "ОДА Премиум", "np": "Москва", "lat": 55.993261, "lon": 37.224004, "km": 12.9, "deals": 0, "price_m2": null, "is_mechta": false, "radius_m": 311, "color": "#2980b9", "fill": "#3498db"}];
+const map = L.map('map').setView([56.07420096, 37.37265322], 10);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 16,
+  attribution: '&copy; OpenStreetMap'
+}).addTo(map);
+
+// distance rings
+[10,15,20,25,32].forEach(km => {
+  L.circle([56.07420096, 37.37265322], {
+    radius: km*1000, color:'#888', weight:1, dashArray:'6 6', fill:false, opacity:0.7
+  }).addTo(map).bindTooltip(km + ' км');
+});
+
+points.forEach(p => {
+  const deals = p.deals;
+  const circle = L.circle([p.lat, p.lon], {
+    radius: p.radius_m,
+    color: p.color,
+    fillColor: p.fill,
+    fillOpacity: p.is_mechta ? 0.45 : 0.35,
+    weight: p.is_mechta ? 3 : 1.5
+  }).addTo(map);
+  const price = p.price_m2 ? (Math.round(p.price_m2/1000) + ' тыс. ₽/м²') : '—';
+  circle.bindPopup(
+    `<b>${p.name}</b><br/>` +
+    `${p.np} · ${p.gk}<br/>` +
+    `<b>${deals}</b> сделок нетто · ${p.km} км от Мечты<br/>` +
+    `${price}`
+  );
+  if (p.is_mechta || deals >= 60) {
+    circle.bindTooltip(`${p.name} · ${deals}`, {permanent: false, direction:'top'});
+  }
+});
+</script>
+</body>
+</html>
